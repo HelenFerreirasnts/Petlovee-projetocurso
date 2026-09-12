@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Pet - Encontre seu novo amigo</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. VARIÁVEIS E ESTILOS GERAIS
+       ========================================================================== */
+    :root {
+      --bg-primary: #fdf8f6;
+      --bg-card: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --primary: #e11d48;
+      --primary-hover: #be123c;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05);
+      --shadow-hover: 0 20px 25px -5px rgba(225, 29, 72, 0.15);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ==========================================================================
+       2. CABEÇALHO E HERO
+       ========================================================================== */
+    .navbar {
+      position: sticky; top: 0;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 90; box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      font-weight: 800; font-size: 1.35rem;
+      color: var(--primary); text-decoration: none;
+    }
+
+    .hero-header { text-align: center; margin-bottom: 3rem; }
+    .hero-header h1 { font-size: 2.75rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .hero-header h1 span { color: var(--primary); }
+    .hero-header p { color: var(--text-muted); font-size: 1.125rem; max-width: 620px; margin: 0 auto; }
+
+    /* ==========================================================================
+       3. GRID DE PETS (3 POR LINHA)
+       ========================================================================== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)); /* Trava 3 colunas lado a lado */
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+
+    .card-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 180px; /* Tamanho compacto ideal */
+      overflow: hidden;
+    }
+
+    .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .badge {
+      position: absolute; top: 12px; right: 12px;
+      padding: 4px 12px; border-radius: 9999px;
+      font-size: 0.75rem; font-weight: 700;
+      background: var(--bg-card); color: var(--primary);
+    }
+
+    .card-body { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+    .card-body h2 { font-size: 1.3rem; margin-bottom: 0.25rem; }
+    .card-body p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.75rem 1.5rem; border-radius: 10px;
+      font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none;
+      transition: var(--transition); text-decoration: none; width: 100%;
+    }
+
+    .btn-primary { background-color: var(--primary); color: #ffffff; text-align: center; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    /* ==========================================================================
+       4. SEÇÃO DE DOAÇÃO / DADOS FICTÍCIOS NO FINAL
+       ========================================================================== */
+    .donation-section {
+      margin-top: 4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 2.5rem; text-align: center; box-shadow: var(--shadow-md);
+    }
+
+    .donation-section h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .donation-section p { color: var(--text-muted); max-width: 600px; margin: 0 auto 1.5rem auto; }
+
+    .pix-box {
+      display: inline-flex; flex-direction: column; align-items: center; gap: 0.75rem;
+      background: var(--bg-primary); padding: 1.5rem; border-radius: 12px; border: 1px dashed var(--primary);
+    }
+
+    .pix-input {
+      font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--primary);
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px;
+      padding: 0.5rem; text-align: center; width: 100%; max-width: 320px;
+    }
+
+    /* ==========================================================================
+       5. MODAL SEM JAVASCRIPT (USANDO :target)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden; transition: var(--transition);
+    }
+
+    .modal-overlay:target {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius); padding: 2rem; width: 90%; max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .close-btn {
+      background: transparent; border: none; font-size: 1.5rem;
+      color: var(--text-muted); cursor: pointer; text-decoration: none; line-height: 1;
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
+      border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       6. RODAPE
+       ========================================================================== */
+    footer {
+      background: var(--bg-card); border-top: 1px solid var(--border-color);
+      padding: 3rem 1.5rem; margin-top: 4rem; text-align: center;
+    }
+
+    .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .social-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-main);
+      text-decoration: none; font-weight: 600; padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color); border-radius: 8px; transition: var(--transition);
+    }
+
+    .social-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Responsividade apenas para celulares pequenos */
+    @media (max-width: 768px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="#" class="brand">🐾 Match Pet</a>
+  </nav>
+
+  <div class="container">
+    <header class="hero-header">
+      <h1>Encontre o seu <span>Match perfeito</span></h1>
+      <p>Conectamos animais resgatados a lares cheios de amor. Clique em Dar Match para iniciar a adoção!</p>
+    </header>
+
+    <!-- GRID DE 9 PETS (3 POR LINHA) -->
+    <main class="cards-grid">
+      
+      <!-- PET 1 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Cão • 2 anos</span>
+          <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80" alt="Thor">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Thor</h2>
+            <p>Brincalhão, sociável com outros animais e adora passeios ao ar livre.</p>
+          </div>
+          <a href="#modal-thor" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+      <!-- PET 2 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Gata • 1 ano</span>
+          <img src="https://imgs.search.brave.com/2oM4SL0bYOg-RO4-2fQVGlMnIz1xZf-JdpRlAE-qV6c/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wZXRz/Y2FyZS1hc3NldHMt/cHJvZC5zMy5hbWF6/b25hd3MuY29tL21l/ZGlhL29yaWdpbmFs/X2ltYWdlcy9zZXJl/bmUtcmFnZG9sbC1j/YXQtbGFwLXJlc3Rp/bmctaG9tZS00NzIx/OS53ZWJw "alt="Luna">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Luna</h2>
+            <p>Carinhosa, tranquila e ama um bom cochilo no colo. Ideal para apartamentos.</p>
+          </div>
+          <a href="#modal-luna" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+      <!-- PET 3 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Cão •  1 ano</span>
+          <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80" alt="Bob">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Bob</h2>
+            <p>Cheio de energia e curiosidade! Procura uma família amorosa.</p>
+          </div>
+          <a href="#modal-bob" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+      <!-- PET 4 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Gata • 6 meses</span>
+          <img src="https://imgs.search.brave.com/lfLSmccy_0T1UHn1BFyWLrDg2fOa_yyLyDqa1WnqscY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/Zm90b3MtcHJlbWl1/bS9nYXRpbmhvLWxp/c3RyYWRvLWVuZ3Jh/Y2Fkby1jb20tb2xo/b3MtZG91cmFkb3Mt/YnJpbmNhbmRvLWNv/bS1hcnJhbmhhZG9y/XzI2NTY1Ny0yNjMu/anBnP3NpemU9NjI2/JmV4dD1qcGc "alt="Mimi">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Mimi</h2>
+            <p>Super dócil, adora arranhadores e se dá muito bem com crianças.</p>
+          </div>
+          <a href="#modal-mimi" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+      <!-- PET 5 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+            <span class="badge">Cão • 3 anos</span>
+          <img src="https://imgs.search.brave.com/p0J8GbF4sY8tyuLCfGzDR1MLugPeZrIvW59LyWrLCsI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/c2hvcGlmeS5jb20v/cy9maWxlcy8xLzAy/OTMvMzAyNC8zNjYz/L2ZpbGVzL2NhY2hv/cnJvLWRlLXJhY2Ex/LmpwZz92PTE3NTg4/OTQyMTQ "alt="Max">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Max</h2>
+            <p>Calmo, leal e já adestrado. Perfeito para quem busca um companheiro quieto.</p>
+          </div>
+          <a href="#modal-max" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+      <!-- PET 6 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Gato • 6 meses</span>
+          <img src="https://imgs.search.brave.com/nfGyN7iDpvIi3IPRaqZZ0tzMLxa7mRXPh8ekh_QzDz8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/Zm90b3MtcHJlbWl1/bS92aXN0YS1sYXRl/cmFsLWRlLXVtLWdh/dG8tb2xoYW5kby1w/ZWxhLWphbmVsYS1l/bS1jYXNhXzEwNDg5/NDQtMjg4NjUxMjAu/anBnP3NlbXQ9YWlz/X2h5YnJpZCZ3PTc0/MCZxPTgw" alt="Simba">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Simba</h2>
+            <p>Curioso, companheiro e adora observar a vista pela janela.</p>
+          </div>
+          <a href="#modal-simba" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+     <!-- PET 7 -->
+      <article class="card">
+        <div class="card-img-wrapper">
+          <span class="badge">Gato • 4 meses</span>
+          <img src="https://imgs.search.brave.com/J2kU1sMsuWAYqrl1yPrWXWO7Nv9SCf7eaeb1crQtuA8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YWR2YW5jZS1hZmZp/bml0eS5jb20vZHcv/aW1hZ2UvdjIvYmRn/eF9wcmQvb24vZGVt/YW5kd2FyZS5zdGF0/aWMvLS9MaWJyYXJ5/LVNpdGVzLUFkdmFu/Y2VTaGFyZWRMaWJy/YXJ5L2RlZmF1bHQv/ZHcwY2ZmZjE1NC9v/cmFjbGVJbWFnZXMv/Q09OVDM1MTcwMEY5/Qzc0MzRGMDdCNkEw/Q0E3NDQ3MjBBODFE/LW5hdGl2ZS5wbmc "alt="Leo">
+        </div>
+        <div class="card-body">
+          <div>
+            <h2>Leo</h2>
+            <p>Dorme durante o dia pra gastar as energias à noite. Adora brincar com ratinhos de mentira. </p>
+          </div>
+          <a href="#modal-leo" class="btn btn-primary">❤️ Dar Match</a>
+        </div>
+      </article>
+
+<!-- PET 8 -->
+     <article class="card">
+    <div class="card-img-wrapper">
+        <span class="badge">Cachorra • 5 meses</span>
+    <img src="https://imgs.search.brave.com/dGA5W2ASDQCZa5cpR7a6teNJNXANYka43LCKijOb-FA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNjM2/NDc1NDk2L3B0L2Zv/dG8vcG9ydHJhaXQt/b2YtYnJvd24tcHVw/cHktd2l0aC1ib2tl/aC1iYWNrZ3JvdW5k/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz1RZ2RxQzJ0ajdE/SmVHbkQ2NlVMeU1z/R3VjR1ZUaVJENHVL/Z0xBY0Y0Z1pNPQ "alt="Zara">
+  </div>
+  <div class="card-body">
+    <div>
+      <h2>Zara</h2>
+      <p>Manhosa, carinhosa e adora uma boa soneca. </p>
+    </div>
+    
+    <!-- 4. O segredo da ligação: o href precisa ter a '#' seguida do ID do modal -->
+    <a href="#modal-zara" class="btn btn-primary">❤️ Dar Match</a>
+  </div>
+</article>   
+ 
+<!-- PET 9 -->
+     <article class="card">
+    <div class="card-img-wrapper">
+        <span class="badge">Cachorro • 3 meses</span>
+    <img src=https://imgs.search.brave.com/XoN6MW76Gmu8JS0-hI9usEKKPWj2wwY0ayol_Gng3DQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9lcy5i/YW5maWVsZC5jb20v/LS9tZWRpYS9Qcm9q/ZWN0L0JhbmZpZWxk/L01haW4vZW4vV2Vs/bG5lc3NfYXRfQmFu/ZmllbGQvUHVwcHlf/SHViL1B1cHB5X0h1/Yl8wLTNfTW9udGhz/LzA5OTJfMTVfNHgz/TC5qcGc_aD0xMTUz/Jmlhcj0wJnc9MTUz/NiZyZXY9ZTNhMGUy/NWJkZDc0NDMxNGI2/NTIxNTAwMGY4ZjBh/ZmImaGFzaD05QTk0/MDMxMTkwMjc0MjBE/RkVDMkY2NDgzMTk2/RjA3OQ "alt="Zeus">
+  </div>
+  <div class="card-body">
+    <div>
+      <h2>Zeus</h2>
+      <p>Ainda em descoberta da personalidade, ama um colo e brincar. </p>
+    </div>
+    
+    <!-- 4. O segredo da ligação: o href precisa ter a '#' seguida do ID do modal -->
+    <a href="#modal-zeus" class="btn btn-primary">❤️ Dar Match</a>
+  </div>
+</article>   
+
+
+
+
+
+
+    </main>
+
+    <!-- SEÇÃO DE DOAÇÃO / DADOS FICTÍCIOS NO FINAL -->
+    <section class="donation-section">
+      <h2>💛 Ajude nosso projeto</h2>
+      <p>Não pode adotar agora? Ajude a manter a ração e os cuidados médicos dos nossos bichinhos com uma doação via PIX fictício!</p>
+      
+      <div class="pix-box">
+        <span>Chave PIX (E-mail fictício):</span>
+        <input type="text" class="pix-input" value="doacoes@matchpetficticio.org" readonly onclick="this.select();">
+        <small style="color: var(--text-muted)">Clique no campo para selecionar a chave</small>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAIS DE FORMULÁRIO (UM PARA CADA PET) -->
+
+  <!-- MODAL THOR -->
+  <div class="modal-overlay" id="modal-thor">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar o Thor</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-thor">Seu Nome Completo</label>
+          <input type="text" id="nome-thor" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-thor">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-thor" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-thor">Por que você deseja adotar?</label>
+          <textarea id="msg-thor" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL LUNA -->
+  <div class="modal-overlay" id="modal-luna">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar a Luna</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-luna">Seu Nome Completo</label>
+          <input type="text" id="nome-luna" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-luna">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-luna" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-luna">Por que você deseja adotar?</label>
+          <textarea id="msg-luna" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL BOB -->
+  <div class="modal-overlay" id="modal-bob">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar o Bob</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-bob">Seu Nome Completo</label>
+          <input type="text" id="nome-bob" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-bob">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-bob" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-bob">Por que você deseja adotar?</label>
+          <textarea id="msg-bob" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL MIMI -->
+  <div class="modal-overlay" id="modal-mimi">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar a Mimi</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-mimi">Seu Nome Completo</label>
+          <input type="text" id="nome-mimi" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-mimi">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-mimi" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-mimi">Por que você deseja adotar?</label>
+          <textarea id="msg-mimi" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL MAX -->
+  <div class="modal-overlay" id="modal-max">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar o Max</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-max">Seu Nome Completo</label>
+          <input type="text" id="nome-max" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-max">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-max" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-max">Por que você deseja adotar?</label>
+          <textarea id="msg-max" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL SIMBA -->
+  <div class="modal-overlay" id="modal-simba">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Adotar o Simba</h3>
+        <a href="#" class="close-btn">&times;</a>
+      </div>
+      <form action="#" method="GET">
+        <div class="form-group">
+          <label for="nome-simba">Seu Nome Completo</label>
+          <input type="text" id="nome-simba" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="tel-simba">WhatsApp / Telefone</label>
+          <input type="tel" id="tel-simba" required placeholder="(81) 98888-7777">
+        </div>
+        <div class="form-group">
+          <label for="msg-simba">Por que você deseja adotar?</label>
+          <textarea id="msg-simba" rows="3" placeholder="Conte um pouco sobre seu lar..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Cadastro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- RODAPÉ E REDES SOCIAIS -->
+  <footer>
+    <div class="social-links">
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+        📸 Instagram (@matchpet_oficial)
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+        📘 Facebook
+      </a>
+    </div>
+    <p>&copy; 2026 Match Pet. Projeto Fictício para Adoção de Animais.</p>
+  </footer>
+
+</body>
+</html>
